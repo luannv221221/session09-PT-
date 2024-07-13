@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Space, Spin, Table, Tag } from 'antd';
+import { Button, Modal, Pagination, Space, Spin, Table, Tag } from 'antd';
 import ModalAddCategory from './ModalAddCategory';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCategoriesThunk } from './redux/reducres/categorySlice';
@@ -44,8 +44,11 @@ const columns = [
 const Category = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const dataAPI = useSelector((state) => state.category.data);
+    const totalPage = useSelector((state) => state.category.totalPages) + 1;
+    const totalElement = useSelector((state) => state.category.totalElements);
     const isLoading = useSelector((state) => state.category.loading);
-
+    const [flag, setFlag] = useState(true);
+    console.log(totalPage);
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -56,10 +59,21 @@ const Category = () => {
 
         setIsModalOpen(false);
     };
+    const [currentPage, setCurrent] = useState(1);
+    const onChangePage = (currentPage) => {
+        console.log(currentPage);
+        setCurrent(currentPage);
+        setFlag(!flag)
+    }
     const dispath = useDispatch();
     useEffect(() => {
-        dispath(getCategoriesThunk());
-    }, [])
+        dispath(getCategoriesThunk({ page: currentPage }));
+    }, [flag])
+
+    function onShowSizeChange(current, pageSize) {
+        console.log(current, pageSize);
+    }
+
     return (
         <>
             {isLoading ? <Spin /> :
@@ -70,6 +84,8 @@ const Category = () => {
                     </Button>
 
                     <Table columns={columns} dataSource={dataAPI} rowKey={record => record.categoryId} pagination={false} />
+                    <Pagination onChange={(currentPage) => onChangePage(currentPage)}
+                        total={totalElement} current={currentPage} pageSize={totalPage} />
                     <ModalAddCategory handleOk={handleOk} handleCancel={handleCancel} isModalOpen={isModalOpen} />
                 </>
             }
