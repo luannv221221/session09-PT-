@@ -1,16 +1,35 @@
 import { Button, Form, Input, Modal, Switch } from 'antd'
-import React from 'react'
+import axios from 'axios';
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { getCategoriesThunk } from './redux/reducres/categorySlice';
 
-function ModalAddCategory({ isModalOpen, handleOk, handleCancel }) {
+function ModalAddCategory({ isModalOpen, handleCancel, handleOk }) {
+
+    const [category, setCategory] = useState({
+        categoryName: "",
+        categoryStatus: ""
+    });
+
     const onFinish = (values) => {
         console.log('Success:', values);
     };
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
+    const dispath = useDispatch();
+    const addCategory = () => {
+        console.log(category);
+        axios.post("http://localhost:8080/api/v1/categories", category).then((res) => {
+            handleCancel();
+            dispath(getCategoriesThunk());
+        }).catch((err) => console.log(err));
+    }
+
+
     return (
         <>
-            <Modal title="Thêm mới danh mục" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Modal title="Thêm mới danh mục" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={false}>
                 <Form
                     name="basic"
                     labelCol={{
@@ -28,6 +47,7 @@ function ModalAddCategory({ isModalOpen, handleOk, handleCancel }) {
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
+
                 >
                     <Form.Item
                         label="Category Name"
@@ -39,10 +59,10 @@ function ModalAddCategory({ isModalOpen, handleOk, handleCancel }) {
                             },
                         ]}
                     >
-                        <Input />
+                        <Input onChange={(e) => setCategory({ ...category, categoryName: e.target.value })} />
                     </Form.Item>
                     <Form.Item name="status" label="status" valuePropName="checked">
-                        <Switch />
+                        <Switch onChange={(checked) => setCategory({ ...category, categoryStatus: checked })} />
                     </Form.Item>
 
                     <Form.Item
@@ -52,6 +72,11 @@ function ModalAddCategory({ isModalOpen, handleOk, handleCancel }) {
                         }}
                     >
 
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" block onClick={addCategory}>
+                            Thêm mới
+                        </Button>
                     </Form.Item>
                 </Form>
             </Modal>

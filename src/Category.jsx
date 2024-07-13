@@ -45,7 +45,7 @@ const Category = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const dataAPI = useSelector((state) => state.category.data);
     const isLoading = useSelector((state) => state.category.loading);
-    console.log("data", dataAPI);
+
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -53,6 +53,7 @@ const Category = () => {
         setIsModalOpen(false);
     };
     const handleCancel = () => {
+
         setIsModalOpen(false);
     };
     const dispath = useDispatch();
@@ -68,7 +69,7 @@ const Category = () => {
                         Thêm mới
                     </Button>
 
-                    <Table columns={columns} dataSource={dataAPI} rowKey={record => record.categoryId} />
+                    <Table columns={columns} dataSource={dataAPI} rowKey={record => record.categoryId} pagination={false} />
                     <ModalAddCategory handleOk={handleOk} handleCancel={handleCancel} isModalOpen={isModalOpen} />
                 </>
             }
